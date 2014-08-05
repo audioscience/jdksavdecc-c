@@ -11872,9 +11872,9 @@ struct jdksavdecc_descriptor_avb_interface {
     uint8_t clock_accuracy;
     uint8_t priority2;
     uint8_t domain_number;
-    uint8_t log_sync_interval;
-    uint8_t log_announce_interval;
-    uint8_t log_pdelay_interval;
+    int8_t log_sync_interval;
+    int8_t log_announce_interval;
+    int8_t log_pdelay_interval;
     uint16_t port_number;
 };
 
