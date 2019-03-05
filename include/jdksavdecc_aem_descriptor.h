@@ -1056,7 +1056,7 @@ struct jdksavdecc_descriptor
 /*@}*/
 
 /** \addtogroup descriptor_stream STREAM_INPUT and STREAM_OUTPUT Descriptor -
- * Clause 7.2.6  */
+ * Clause 7.2.6 */
 /*@{*/
 
 #define JDKSAVDECC_DESCRIPTOR_STREAM_OFFSET_DESCRIPTOR_TYPE ( 0 )
@@ -1125,6 +1125,13 @@ struct jdksavdecc_descriptor
 #define JDKSAVDECC_DESCRIPTOR_STREAM_FLAG_TERTIARY_BACKUP_VALID ( 0x0200 )
 #define JDKSAVDECC_DESCRIPTOR_STREAM_FLAG_TERTIARY_BACKUP_VALID_MASK                                                           \
     ( ~JDKSAVDECC_DESCRIPTOR_STREAM_FLAG_TERTIARY_BACKUP_VALID )
+
+/* Milan 6.8.6 */
+#define JDKSAVDECC_DESCRIPTOR_STREAM_FLAG_PROBING_DISABLED  ( 0x0 )
+#define JDKSAVDECC_DESCRIPTOR_STREAM_FLAG_PROBING_PASSIVE   ( 0x1 )
+#define JDKSAVDECC_DESCRIPTOR_STREAM_FLAG_PROBING_ACTIVE    ( 0x2 )
+#define JDKSAVDECC_DESCRIPTOR_STREAM_FLAG_PROBING_COMPLETED ( 0x3 )
+
 
 /*@}*/
 
