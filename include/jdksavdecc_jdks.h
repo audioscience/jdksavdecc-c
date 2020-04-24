@@ -574,6 +574,117 @@ static inline ssize_t
 
 extern struct jdksavdecc_eui64 jdksavdecc_jdks_aem_control_ipv4_parameters;
 
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_VENDOR_EUI64               ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN +  0 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_TYPE  ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN +  8 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_INDEX ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 10 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_FLAGS                      ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 12 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_ADDRESS               ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 16 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_NETMASK               ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 20 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_GATEWAY               ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 24 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_BROADCAST             ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 28 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER1            ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 32 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER2            ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 36 )
+#define JDKSAVDECC_JDKS_IPV4_CONTROL_LEN                               ( JDKSAVDECC_AEM_COMMAND_SET_CONTROL_RESPONSE_LEN + 40 )
+
+struct jdksavdecc_values_ipv4
+{
+	uint16_t interface_descriptor_type;
+	uint16_t interface_descriptor_index;
+	uint32_t flags;
+	uint32_t ipv4_address;
+	uint32_t ipv4_netmask;
+	uint32_t ipv4_gateway;
+	uint32_t ipv4_broadcast;
+	uint32_t ipv4_dnsserver1;
+	uint32_t ipv4_dnsserver2;
+};
+
+struct jdksavdecc_jdks_ipv4_control
+{
+	struct jdksavdecc_aem_command_set_control cmd;
+	struct jdksavdecc_eui64 vendor_eui64;
+	struct jdksavdecc_values_ipv4 ipv4;
+};
+
+/**
+ * @brief jdksavdecc_aem_command_set_control_ipv4_read parses all the data in a SET CONTROL command received
+ *
+ * @param p
+ *        Pointer to the jdksavdecc_values_ipv4 structure
+ *
+ * @param buf
+ *        The raw ethernet frame packet, starting at DA,SA,Ethertype
+ *
+ * @param len
+ *        The length of the memory at buf
+ *
+ * @return The length of the data parsed, or -1 on error
+ */
+ static inline ssize_t jdksavdecc_jdks_aem_command_set_control_ipv4_read(struct jdksavdecc_jdks_ipv4_control *p, void *buf, size_t pos, size_t len)
+{
+	struct jdksavdecc_eui64 vendorid;
+
+	ssize_t r = jdksavdecc_validate_range(pos, len, JDKSAVDECC_JDKS_IPV4_CONTROL_LEN);
+	if (r >= 0)
+	{
+		jdksavdecc_aem_command_set_control_read(&p->cmd, buf, pos, len);
+		jdksavdecc_eui64_read(&p->vendor_eui64, buf, JDKSAVDECC_JDKS_LOG_CONTROL_OFFSET_VENDOR_EUI64 + pos, len);
+		if (jdksavdecc_eui64_compare(&jdksavdecc_jdks_aem_control_ipv4_parameters, &p->vendor_eui64) == 0)
+		{
+			jdksavdecc_uint16_read(&p->ipv4.interface_descriptor_type, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_TYPE + pos, len);
+			jdksavdecc_uint16_read(&p->ipv4.interface_descriptor_index, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_INDEX + pos, len);
+			jdksavdecc_uint32_read(&p->ipv4.flags, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_FLAGS + pos, len);
+			jdksavdecc_uint32_read(&p->ipv4.ipv4_address, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_ADDRESS + pos, len);
+			jdksavdecc_uint32_read(&p->ipv4.ipv4_netmask, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_NETMASK + pos, len);
+			jdksavdecc_uint32_read(&p->ipv4.ipv4_gateway, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_GATEWAY + pos, len);
+			jdksavdecc_uint32_read(&p->ipv4.ipv4_broadcast, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_BROADCAST + pos, len);
+			jdksavdecc_uint32_read(&p->ipv4.ipv4_dnsserver1, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER1 + pos, len);
+			jdksavdecc_uint32_read(&p->ipv4.ipv4_dnsserver2, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER2 + pos, len);
+		}
+		else
+		{
+			r = -1;
+		}
+	}
+	return r;
+}
+
+/**
+* @brief jdksavdecc_aem_command_set_control_ipv4_write writes all the data for SET CONTROL command
+*
+* @param p
+*        Pointer to the jdksavdecc_values_ipv4 structure
+*
+* @param buf
+*        The raw ethernet frame packet, starting at DA,SA,Ethertype
+*
+* @param len
+*        The length of the memory at buf
+*
+* @return The length of the data parsed, or -1 on error
+*/
+static inline ssize_t jdksavdecc_jdks_aem_command_set_control_ipv4_write(struct jdksavdecc_jdks_ipv4_control *p, void *buf, size_t pos, size_t len)
+{
+	struct jdksavdecc_eui64 vendorid;
+
+	ssize_t r = jdksavdecc_validate_range(pos, len, JDKSAVDECC_JDKS_IPV4_CONTROL_LEN);
+	if (r >= 0)
+	{
+		jdksavdecc_aem_command_set_control_write(&p->cmd, buf, pos, len);
+		jdksavdecc_eui64_write(&p->vendor_eui64, buf, JDKSAVDECC_JDKS_LOG_CONTROL_OFFSET_VENDOR_EUI64 + pos, len);
+		jdksavdecc_uint16_write(&p->ipv4.interface_descriptor_type, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_TYPE + pos, len);
+		jdksavdecc_uint16_write(&p->ipv4.interface_descriptor_index, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_INDEX + pos, len);
+		jdksavdecc_uint32_write(&p->ipv4.flags, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_FLAGS + pos, len);
+		jdksavdecc_uint32_write(&p->ipv4.ipv4_address, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_ADDRESS + pos, len);
+		jdksavdecc_uint32_write(&p->ipv4.ipv4_netmask, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_NETMASK + pos, len);
+		jdksavdecc_uint32_write(&p->ipv4.ipv4_gateway, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_GATEWAY + pos, len);
+		jdksavdecc_uint32_write(&p->ipv4.ipv4_broadcast, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_BROADCAST + pos, len);
+		jdksavdecc_uint32_write(&p->ipv4.ipv4_dnsserver1, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER1 + pos, len);
+		jdksavdecc_uint32_write(&p->ipv4.ipv4_dnsserver2, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER2 + pos, len);
+	}
+	return r;
+}
+
 /*@}*/
 
 #ifdef __cplusplus
