@@ -630,33 +630,83 @@ struct jdksavdecc_jdks_ipv4_control
  *
  * @return The length of the data parsed, or -1 on error
  */
- static inline ssize_t jdksavdecc_jdks_aem_command_set_control_ipv4_read(struct jdksavdecc_jdks_ipv4_control *p, void *buf, size_t pos, size_t len)
+static inline ssize_t jdksavdecc_jdks_aem_command_set_control_ipv4_read(struct jdksavdecc_jdks_ipv4_control *p, void *buf, size_t pos, size_t len)
 {
-	struct jdksavdecc_eui64 vendorid;
+    ssize_t r = jdksavdecc_validate_range(pos, len, JDKSAVDECC_JDKS_IPV4_CONTROL_LEN);
+    if (r >= 0)
+    {
+        jdksavdecc_aem_command_set_control_read(&p->cmd, buf, pos, len);
+        jdksavdecc_eui64_read(&p->vendor_eui64, buf, JDKSAVDECC_JDKS_LOG_CONTROL_OFFSET_VENDOR_EUI64 + pos, len);
+        struct jdksavdecc_eui64 jdks_ipv4_eui64 = JDKSAVDECC_JDKS_AEM_CONTROL_IPV4_PARAMETERS;
+        if (jdksavdecc_eui64_compare(&jdks_ipv4_eui64, &p->vendor_eui64) == 0)
+        {
+            jdksavdecc_uint16_read(&p->ipv4.interface_descriptor_type, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_TYPE + pos, len);
+            jdksavdecc_uint16_read(&p->ipv4.interface_descriptor_index, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_INDEX + pos, len);
+            jdksavdecc_uint32_read(&p->ipv4.flags, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_FLAGS + pos, len);
+            jdksavdecc_uint32_read(&p->ipv4.ipv4_address, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_ADDRESS + pos, len);
+            jdksavdecc_uint32_read(&p->ipv4.ipv4_netmask, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_NETMASK + pos, len);
+            jdksavdecc_uint32_read(&p->ipv4.ipv4_gateway, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_GATEWAY + pos, len);
+            jdksavdecc_uint32_read(&p->ipv4.ipv4_broadcast, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_BROADCAST + pos, len);
+            jdksavdecc_uint32_read(&p->ipv4.ipv4_dnsserver1, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER1 + pos, len);
+            jdksavdecc_uint32_read(&p->ipv4.ipv4_dnsserver2, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER2 + pos, len);
+        }
+        else
+        {
+            r = -1;
+        }
+    }
+    return r;
+}
 
-	ssize_t r = jdksavdecc_validate_range(pos, len, JDKSAVDECC_JDKS_IPV4_CONTROL_LEN);
-	if (r >= 0)
-	{
-		jdksavdecc_aem_command_set_control_read(&p->cmd, buf, pos, len);
-		jdksavdecc_eui64_read(&p->vendor_eui64, buf, JDKSAVDECC_JDKS_LOG_CONTROL_OFFSET_VENDOR_EUI64 + pos, len);
-		if (jdksavdecc_eui64_compare(&jdksavdecc_jdks_aem_control_ipv4_parameters, &p->vendor_eui64) == 0)
-		{
-			jdksavdecc_uint16_read(&p->ipv4.interface_descriptor_type, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_TYPE + pos, len);
-			jdksavdecc_uint16_read(&p->ipv4.interface_descriptor_index, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_INTERFACE_DESCRIPTOR_INDEX + pos, len);
-			jdksavdecc_uint32_read(&p->ipv4.flags, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_FLAGS + pos, len);
-			jdksavdecc_uint32_read(&p->ipv4.ipv4_address, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_ADDRESS + pos, len);
-			jdksavdecc_uint32_read(&p->ipv4.ipv4_netmask, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_NETMASK + pos, len);
-			jdksavdecc_uint32_read(&p->ipv4.ipv4_gateway, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_GATEWAY + pos, len);
-			jdksavdecc_uint32_read(&p->ipv4.ipv4_broadcast, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_BROADCAST + pos, len);
-			jdksavdecc_uint32_read(&p->ipv4.ipv4_dnsserver1, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER1 + pos, len);
-			jdksavdecc_uint32_read(&p->ipv4.ipv4_dnsserver2, buf, JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_DNSSERVER2 + pos, len);
-		}
-		else
-		{
-			r = -1;
-		}
-	}
-	return r;
+/**
+ * Extract the uint32 value of the ipv4_address field of the
+ *COMMAND_GET_JDKS_IPV4_CONTROL_RESPONSE object from a network buffer.
+ *
+ *
+ * No bounds checking of the memory buffer is done. It is the caller's
+ *responsibility to pre-validate base and pos.
+ *
+ * @param base pointer to raw memory buffer to read from.
+ * @param pos offset from base to read the field from;
+ * @return the uint32_t ip address value
+ */
+static inline uint32_t jdksavdecc_aem_command_get_jdks_ipv4_control_response_get_ipv4_address( void const *base, ssize_t pos )
+{
+    return jdksavdecc_uint32_get( base, pos + JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_ADDRESS );
+}
+
+/**
+ * Extract the uint32 value of the ipv4_netmask field of the
+ *COMMAND_GET_JDKS_IPV4_CONTROL_RESPONSE object from a network buffer.
+ *
+ *
+ * No bounds checking of the memory buffer is done. It is the caller's
+ *responsibility to pre-validate base and pos.
+ *
+ * @param base pointer to raw memory buffer to read from.
+ * @param pos offset from base to read the field from;
+ * @return the uint32_t ip netmask value
+ */
+static inline uint32_t jdksavdecc_aem_command_get_jdks_ipv4_control_response_get_ipv4_netmask( void const *base, ssize_t pos )
+{
+    return jdksavdecc_uint32_get( base, pos + JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_IPV4_NETMASK );
+}
+
+/**
+ * Extract the uint32 value of the flags field of the
+ *COMMAND_GET_JDKS_IPV4_CONTROL_RESPONSE object from a network buffer.
+ *
+ *
+ * No bounds checking of the memory buffer is done. It is the caller's
+ *responsibility to pre-validate base and pos.
+ *
+ * @param base pointer to raw memory buffer to read from.
+ * @param pos offset from base to read the field from;
+ * @return the uint32_t ip flags value
+ */
+static inline uint32_t jdksavdecc_aem_command_get_jdks_ipv4_control_response_get_flags( void const *base, ssize_t pos )
+{
+    return jdksavdecc_uint32_get( base, pos + JDKSAVDECC_JDKS_IPV4_CONTROL_OFFSET_FLAGS );
 }
 
 /**
