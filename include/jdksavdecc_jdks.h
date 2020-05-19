@@ -598,22 +598,22 @@ extern struct jdksavdecc_eui64 jdksavdecc_jdks_aem_control_ipv4_parameters;
 
 struct jdksavdecc_values_ipv4
 {
-	uint16_t interface_descriptor_type;
-	uint16_t interface_descriptor_index;
-	uint32_t flags;
-	uint32_t ipv4_address;
-	uint32_t ipv4_netmask;
-	uint32_t ipv4_gateway;
-	uint32_t ipv4_broadcast;
-	uint32_t ipv4_dnsserver1;
-	uint32_t ipv4_dnsserver2;
+    uint16_t interface_descriptor_type;
+    uint16_t interface_descriptor_index;
+    uint32_t flags;
+    uint32_t ipv4_address;
+    uint32_t ipv4_netmask;
+    uint32_t ipv4_gateway;
+    uint32_t ipv4_broadcast;
+    uint32_t ipv4_dnsserver1;
+    uint32_t ipv4_dnsserver2;
 };
 
 struct jdksavdecc_jdks_ipv4_control
 {
-	struct jdksavdecc_aem_command_set_control cmd;
-	struct jdksavdecc_eui64 vendor_eui64;
-	struct jdksavdecc_values_ipv4 ipv4;
+    struct jdksavdecc_aem_command_set_control cmd;
+    struct jdksavdecc_eui64 vendor_eui64;
+    struct jdksavdecc_values_ipv4 ipv4;
 };
 
 /**
